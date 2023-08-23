@@ -42,7 +42,7 @@
 #define NULINK_READ_TIMEOUT  1000
 
 #define NULINK_INTERFACE_NUM  0
-#define NULINK2_INTERFACE_NUM 3
+#define NULINK2_INTERFACE_NUM 0 // 3
 
 #define NULINK_RX_EP  (1|ENDPOINT_IN)
 #define NULINK_TX_EP  (2|ENDPOINT_OUT)
@@ -1605,6 +1605,7 @@ static int nulink_usb_open(struct hl_interface_param_s *param, void **fd)
 	}
 
 	/* get the Nu-Link version */
+  LOG_INFO("jtag_libusb_open()");
 	if (jtag_libusb_open(vid_nulink2, pid_nulink2, serial, &h->fd) == ERROR_OK) {
 		h->hardwareConfig = (h->hardwareConfig & ~(HARDWARECONFIG_NULINK2)) | HARDWARECONFIG_NULINK2;
 		m_nulink_usb_api.nulink_usb_xfer = nulink2_usb_xfer;
@@ -1653,6 +1654,8 @@ static int nulink_usb_open(struct hl_interface_param_s *param, void **fd)
 	else {
 		LOG_DEBUG("jtag_libusb_detach_kernel_driver succeeded");
 	}
+
+  jtag_libusb_set_configuration(h->fd, h->interface_num);
 
 	err = jtag_libusb_claim_interface(h->fd, h->interface_num);
 	if (err != ERROR_OK) {

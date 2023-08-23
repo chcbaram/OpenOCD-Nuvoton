@@ -513,6 +513,14 @@ int add_service(char *name,
 			LOG_ERROR("couldn't listen on socket: %s", strerror(errno));
 			exit(-1);
 		}
+
+		struct sockaddr_in addr_in;
+		addr_in.sin_port = 0;
+		socklen_t addr_in_size = sizeof(addr_in);
+		if (getsockname(c->fd, (struct sockaddr *)&addr_in, &addr_in_size) == 0)
+			LOG_INFO("Listening on port %hu for %s connections",
+				 ntohs(addr_in.sin_port), c->name);
+             
 	} else if (c->type == CONNECTION_STDINOUT) {
 		c->fd = fileno(stdin);
 
